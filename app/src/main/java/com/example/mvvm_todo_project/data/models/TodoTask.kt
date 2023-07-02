@@ -2,8 +2,7 @@ package com.example.mvvm_todo_project.data.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.mvvm_todo_project.data.constants.Constants
-import java.util.UUID
+import com.example.mvvm_todo_project.data.utils.Constants
 
 
 @Entity(tableName = Constants.DATABASE_TABLE)

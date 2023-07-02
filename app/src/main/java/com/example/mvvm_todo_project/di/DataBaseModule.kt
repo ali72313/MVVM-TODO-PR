@@ -2,15 +2,13 @@ package com.example.mvvm_todo_project.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.example.mvvm_todo_project.data.TodoDao
 import com.example.mvvm_todo_project.data.TodoDataBase
-import com.example.mvvm_todo_project.data.constants.Constants
+import com.example.mvvm_todo_project.data.utils.Constants
 import com.example.mvvm_todo_project.data.repositories.TodoRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
