@@ -21,7 +21,7 @@ interface TodoDao {
     fun getAllTasks(): Flow<List<TodoTask>>
 
     @Query("SELECT * FROM TODO_TABLE WHERE id=:taskId")
-    fun getTask(taskId: UUID): Flow<TodoTask>
+    fun getTask(taskId: Int): Flow<TodoTask>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun newTask(todoTask: TodoTask)
@@ -39,8 +39,8 @@ interface TodoDao {
     fun searchTask(searchQuery: String): Flow<List<TodoTask>>
 
     @Query("SELECT * FROM TODO_TABLE ORDER BY CASE WHEN priority LIKE 'L%' THEN 1  WHEN priority LIKE 'M%' THEN 2 WHEN  priority LIKE 'H%' THEN 3 END ")
-    fun sortByLowPriority(priority: Priority): Flow<List<TodoTask>>
+    fun sortByLowPriority(): Flow<List<TodoTask>>
 
     @Query("SELECT * FROM TODO_TABLE ORDER BY CASE WHEN priority LIKE 'H%' THEN 1  WHEN priority LIKE 'M%' THEN 2 WHEN  priority LIKE 'L%' THEN 3 END ")
-    fun sortByHighPriority(priority: Priority): Flow<List<TodoTask>>
+    fun sortByHighPriority(): Flow<List<TodoTask>>
 }
