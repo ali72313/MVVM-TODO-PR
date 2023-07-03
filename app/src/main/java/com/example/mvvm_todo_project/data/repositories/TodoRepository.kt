@@ -10,6 +10,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
 
