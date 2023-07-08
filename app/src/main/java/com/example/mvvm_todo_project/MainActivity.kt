@@ -3,17 +3,14 @@ package com.example.mvvm_todo_project
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.mvvm_todo_project.navigation.SetupNavigation
 import com.example.mvvm_todo_project.ui.theme.MVVMTODOprojectTheme
+import com.example.mvvm_todo_project.ui.viewModels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -21,12 +18,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MVVMTODOprojectTheme {
+                val sharedViewModel: SharedViewModel = viewModel()
                 navController = rememberNavController()
-                SetupNavigation(navController = navController)
+                SetupNavigation(navController = navController, sharedViewModel)
             }
         }
     }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MVVM-TODO-project</string>
+    <string name="search_tasks">Search Tasks</string>
 </resources>

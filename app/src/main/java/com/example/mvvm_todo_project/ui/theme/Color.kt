@@ -1,9 +1,7 @@
 package com.example.mvvm_todo_project.ui.theme
 
 
-import android.content.res.Resources
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -19,13 +17,28 @@ val Pink40 = Color(0xFF7D5260)
 
 val LowPriorityColor = Color(0xff00c980)
 
-val topAppBarColor
+val topAppBarContentColor
     @Composable
     get() =
-        if (isSystemInDarkTheme()) Color.White else Color.Gray
+        if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.8f) else Color.White
 
 val fabBackGroundColor
     @Composable
     get() =
         if (isSystemInDarkTheme()) Purple40 else Teal200
+
+val topAppBarContainerColor
+    @Composable
+    get() =
+        if (isSystemInDarkTheme()) Color.Black else Purple40
+
+val taskItemBackGroundColor
+    @Composable
+    get() =
+        if (isSystemInDarkTheme()) Color.DarkGray else Color.White
+
+val taskItemTextColor
+    @Composable
+    get() =
+        if (isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
 

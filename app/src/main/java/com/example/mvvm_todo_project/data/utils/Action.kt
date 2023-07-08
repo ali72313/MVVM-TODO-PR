@@ -1,7 +1,7 @@
 package com.example.mvvm_todo_project.data.utils
 
 enum class Action {
-   ADD,
+    ADD,
     UPDATE,
     DELETE,
     DELETE_ALL,
