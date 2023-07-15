@@ -1,43 +1,64 @@
 package com.example.mvvm_todo_project.ui.screens.list
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mvvm_todo_project.data.models.Priority
 import com.example.mvvm_todo_project.data.models.TodoTask
+import com.example.mvvm_todo_project.data.utils.RequestState
 import com.example.mvvm_todo_project.ui.theme.LARGE_PADDING
 import com.example.mvvm_todo_project.ui.theme.PRIORITY_INDICATOR_SIZE
 import com.example.mvvm_todo_project.ui.theme.taskItemBackGroundColor
 import com.example.mvvm_todo_project.ui.theme.taskItemTextColor
 
 @Composable
-fun ListContent() {
+fun ListContent(allTasks: RequestState<List<TodoTask>>, navigateTodoTask: (taskId: Int) -> Unit) {
+
+    if (allTasks is RequestState.Success) {
+        if (allTasks.data.isEmpty()) {
+            EmptyContent()
+        } else {
+            ListContentOfTasks(allTasks = allTasks.data, navigateTodoTask = navigateTodoTask)
+        }
+    }
 
 }
 
+@Composable
+fun ListContentOfTasks(allTasks: List<TodoTask>, navigateTodoTask: (taskId: Int) -> Unit) {
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp))
+    {
+        items(items = allTasks, key = { task -> task.id })
+        { item ->
+            ListItem(task = item, navigateTodoTask = navigateTodoTask)
+        }
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListItem(
     task: TodoTask,
@@ -51,7 +72,9 @@ fun ListItem(
          onClick = { navigateTodoTask(task.id) }
      ) */
     Card(
+        onClick = { navigateTodoTask(task.id) },
         shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = taskItemBackGroundColor),
         modifier = Modifier
             .border(
                 width = 1.dp,
@@ -113,7 +136,7 @@ fun ListItemPreview() {
             0,
             "test",
             "mumble jumble is kind of sad junlge mumble whitch all of the animals in the see dont want to be ",
-            Priority.Low
+            Priority.LOW
         )
     ) {}
 }
