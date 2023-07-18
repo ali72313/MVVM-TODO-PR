@@ -12,6 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mvvm_todo_project.R
+import com.example.mvvm_todo_project.components.DisplayAlertDialog
 import com.example.mvvm_todo_project.data.models.Priority
 import com.example.mvvm_todo_project.data.models.TodoTask
 import com.example.mvvm_todo_project.data.utils.Action
@@ -29,11 +34,12 @@ import com.example.mvvm_todo_project.ui.theme.topAppBarContentColor
 
 @Composable
 fun TaskAppBar(navigateToListScreen: (Action) -> Unit, task: TodoTask?) {
-    if (task?.id == -1) {
+    if (task == null) {
         NewTaskAppBar(navigateToListScreen = navigateToListScreen)
     } else {
         SelectedTaskAppBar(navigateToListScreen = navigateToListScreen, todoTask = task)
     }
+    // NewTaskAppBar(navigateToListScreen = navigateToListScreen)
 
 }
 
@@ -79,7 +85,7 @@ fun NewTaskBarActions(onAddClicked: (Action) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectedTaskAppBar(navigateToListScreen: (Action) -> Unit, todoTask: TodoTask?) {
+fun SelectedTaskAppBar(navigateToListScreen: (Action) -> Unit, todoTask: TodoTask) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = topAppBarContainerColor),
         title = {
@@ -97,7 +103,10 @@ fun SelectedTaskAppBar(navigateToListScreen: (Action) -> Unit, todoTask: TodoTas
 
         }, actions =
         {
-            SelectedTaskAppBarActions(navigateToListScreen = navigateToListScreen)
+            SelectedTaskAppBarActions(
+                navigateToListScreen = navigateToListScreen,
+                todoTask = todoTask
+            )
         }
     )
 
@@ -119,16 +128,25 @@ fun CancelCreatingTask(onCancelClicked: (Action) -> Unit) {
 
 @Composable
 fun SelectedTaskAppBarActions(
-    navigateToListScreen: (Action) -> Unit
+    navigateToListScreen: (Action) -> Unit,
+    todoTask: TodoTask
 ) {
-
-    DeleteTaskAction(onDeleteTaskAction = navigateToListScreen)
+    var openDialog by remember {
+        mutableStateOf(false)
+    }
+    DisplayAlertDialog(
+        title = stringResource(id = R.string.delete_task, todoTask.title),
+        message = stringResource(id = R.string.delete_task_conformation, todoTask.title),
+        openDialog = openDialog,
+        onYesClicked = { navigateToListScreen(Action.DELETE) },
+        closeDialog = { openDialog = false })
+    DeleteTaskAction(onDeleteTaskAction = { openDialog = true })
     UpdateTaskAction(onUpdateTaskAction = navigateToListScreen)
 }
 
 @Composable
-fun DeleteTaskAction(onDeleteTaskAction: (Action) -> Unit) {
-    IconButton(onClick = { onDeleteTaskAction(Action.DELETE) }) {
+fun DeleteTaskAction(onDeleteTaskAction: () -> Unit) {
+    IconButton(onClick = { onDeleteTaskAction() }) {
         Icon(
             imageVector = Icons.Filled.Delete,
             contentDescription = stringResource(id = R.string.search_tasks),

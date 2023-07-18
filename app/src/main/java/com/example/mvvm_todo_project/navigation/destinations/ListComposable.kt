@@ -24,11 +24,12 @@ fun NavGraphBuilder.listComposable(
             type = NavType.StringType
         })
     ) { navBackStackEntry ->
-        val action = navBackStackEntry.arguments?.getString(Constants.LIST_ARGUMENT_KEY).toAction()
+        val action = navBackStackEntry.arguments?.getString(LIST_ARGUMENT_KEY).toAction()
         LaunchedEffect(key1 = action)
         {
             sharedViewModel.action.value = action
         }
+
 
         ListUiScreen(navigateToTaskScreen = navigateToTaskScreen, sharedViewModel = sharedViewModel)
     }

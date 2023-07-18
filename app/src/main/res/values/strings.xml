@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">MVVM-TODO-project</string>
     <string name="search_tasks">Search Tasks</string>
+    <string name="delete_task">Remove \'%1$s\'?</string>
+    <string name="delete_task_conformation">Are you sure you want to remove \'%1$s\'?</string>
 </resources>

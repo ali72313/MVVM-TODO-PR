@@ -28,26 +28,41 @@ import androidx.compose.ui.unit.dp
 import com.example.mvvm_todo_project.data.models.Priority
 import com.example.mvvm_todo_project.data.models.TodoTask
 import com.example.mvvm_todo_project.data.utils.RequestState
+import com.example.mvvm_todo_project.data.utils.SearchAppBarState
 import com.example.mvvm_todo_project.ui.theme.LARGE_PADDING
 import com.example.mvvm_todo_project.ui.theme.PRIORITY_INDICATOR_SIZE
 import com.example.mvvm_todo_project.ui.theme.taskItemBackGroundColor
 import com.example.mvvm_todo_project.ui.theme.taskItemTextColor
 
 @Composable
-fun ListContent(allTasks: RequestState<List<TodoTask>>, navigateTodoTask: (taskId: Int) -> Unit) {
+fun ListContent(
+    allTasks: RequestState<List<TodoTask>>,
+    searchedTasks: RequestState<List<TodoTask>>,
+    navigateTodoTask: (taskId: Int) -> Unit,
+    searchAppBarState: SearchAppBarState
+) {
 
-    if (allTasks is RequestState.Success) {
-        if (allTasks.data.isEmpty()) {
-            EmptyContent()
-        } else {
-            ListContentOfTasks(allTasks = allTasks.data, navigateTodoTask = navigateTodoTask)
+    if (searchAppBarState == SearchAppBarState.TRIGGERED) {
+        if (searchedTasks is RequestState.Success) {
+            HandleListContent(tasks = searchedTasks.data, navigateTodoTask = navigateTodoTask)
         }
+    } else if (allTasks is RequestState.Success) {
+        HandleListContent(tasks = allTasks.data, navigateTodoTask = navigateTodoTask)
     }
-
 }
 
 @Composable
-fun ListContentOfTasks(allTasks: List<TodoTask>, navigateTodoTask: (taskId: Int) -> Unit) {
+fun HandleListContent(tasks: List<TodoTask>, navigateTodoTask: (taskId: Int) -> Unit) {
+    if (tasks.isEmpty()) {
+        EmptyContent()
+    } else {
+        DisplayAllTasks(allTasks = tasks, navigateTodoTask = navigateTodoTask)
+    }
+}
+
+
+@Composable
+fun DisplayAllTasks(allTasks: List<TodoTask>, navigateTodoTask: (taskId: Int) -> Unit) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp))
     {
         items(items = allTasks, key = { task -> task.id })

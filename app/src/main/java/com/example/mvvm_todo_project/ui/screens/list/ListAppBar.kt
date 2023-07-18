@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -36,8 +37,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mvvm_todo_project.R
+import com.example.mvvm_todo_project.components.DisplayAlertDialog
 import com.example.mvvm_todo_project.components.PriorityItem
 import com.example.mvvm_todo_project.data.models.Priority
+import com.example.mvvm_todo_project.data.utils.Action
 import com.example.mvvm_todo_project.data.utils.SearchAppBarState
 import com.example.mvvm_todo_project.data.utils.TrailingIconState
 import com.example.mvvm_todo_project.ui.theme.LARGE_PADDING
@@ -57,22 +60,21 @@ fun ListAppBar(
         SearchAppBarState.CLOSED -> {
             DefaultListAppBar(onSearchClicked = {
                 sharedViewModel.searchAppBarState.value = SearchAppBarState.OPENED
-            }, onSortClicked = {}, DeleteAllTasks = {})
+            }, onSortClicked = {}, DeleteAllTasks = {
+                sharedViewModel.action.value = Action.DELETE_ALL
+            })
         }
 
         else -> {
             SearchAppBar(text = searchTextState,
                 onTextChange = { sharedViewModel.searchTextState.value = it },
                 onCloseClicked = {
-                  //  sharedViewModel.searchTextState.value = ""
+                    sharedViewModel.searchTextState.value = ""
                     sharedViewModel.searchAppBarState.value = SearchAppBarState.CLOSED
 
-                }) {
-
-            }
+                }, onSearchClicked = { sharedViewModel.searchDataBase(it) })
         }
     }
-
 
 }
 
@@ -96,9 +98,16 @@ fun DefaultListAppBar(
 fun ListAppBarActions(
     onSearchClicked: () -> Unit, onSortClicked: (Priority) -> Unit, DeleteAllTasks: () -> Unit
 ) {
+    var openDialog by remember() { mutableStateOf(false) }
+
+    DisplayAlertDialog(
+        title = stringResource(id = R.string.delete_task, "All Tasks "),
+        message = stringResource(id = R.string.delete_task_conformation, "All Tasks "),
+        openDialog = openDialog,
+        onYesClicked = { DeleteAllTasks() }, closeDialog = { openDialog = false })
     SearchAction(onSearchClicked)
     SortAction(sortByPriority = onSortClicked)
-    DeleteAllAction(DeleteAllTasks = DeleteAllTasks)
+    DeleteAllAction(openDialog = { openDialog = true })
 }
 
 @Composable
@@ -144,7 +153,7 @@ fun SortAction(sortByPriority: (Priority) -> Unit) {
 }
 
 @Composable
-fun DeleteAllAction(DeleteAllTasks: () -> Unit) {
+fun DeleteAllAction(openDialog: () -> Unit) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     IconButton(onClick = { isExpanded = true }) {
@@ -156,7 +165,7 @@ fun DeleteAllAction(DeleteAllTasks: () -> Unit) {
         DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             DropdownMenuItem(onClick = {
                 isExpanded = false
-                DeleteAllTasks.invoke()
+                openDialog.invoke()
             }, text = {
                 Text(
                     modifier = Modifier.padding(start = LARGE_PADDING),
@@ -177,7 +186,7 @@ fun SearchAppBar(
     onSearchClicked: (String) -> Unit
 ) {
     var trailingIconState by rememberSaveable {
-        mutableStateOf(TrailingIconState.READY_TO_DELETE)
+        mutableStateOf(TrailingIconState.READY_TO_CLOSE)
     }
 
     Surface(
