@@ -18,13 +18,14 @@ fun SetupNavigation(
     val screen = remember(navController) {
         Screens(navController = navController)
     }
+    val screen1 = Screens(navController = navController)
 
     NavHost(navController = navController, startDestination = SPLASH_SCREEN) {
 
-        splashComposable(navigateToListScreen = screen.splashToList)
-        listComposable(sharedViewModel = sharedViewModel, navigateToTaskScreen = screen.listToTask)
+        splashComposable(navigateToListScreen = screen1.splashToList)
+        listComposable(sharedViewModel = sharedViewModel, navigateToTaskScreen = screen1.listToTask)
 
-        taskComposable(navigateToListScreen = screen.taskToList, sharedViewModel = sharedViewModel)
+        taskComposable(navigateToListScreen = screen1.taskToList, sharedViewModel = sharedViewModel)
     }
 }
 
