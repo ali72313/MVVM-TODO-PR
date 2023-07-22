@@ -28,19 +28,20 @@ import kotlinx.coroutines.launch
 @Composable
 fun ListUiScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedViewModel) {
 
-    /*LaunchedEffect(key1 = true) {
-        sharedViewModel.getAllTasks()
-        Log.d("ListScreen", "LaunchEffect Triggered")
-    }*/
-    val action by sharedViewModel.action
 
+    LaunchedEffect(key1 = true)
+    {
+        sharedViewModel.readSortState()
+    }
+
+    val action by sharedViewModel.action
     val allTasks = sharedViewModel.allTask.collectAsState()
     val searchedTasks by sharedViewModel.searchedTasks.collectAsState()
+    val sortState by sharedViewModel.sortState.collectAsState()
+    val lowPriorityTasks by sharedViewModel.lowPriorityTasks.collectAsState()
+    val highPriorityTasks by sharedViewModel.highPriorityTask.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // val allTasks by  sharedViewModel.allTask.collectAsState() these two lines do the same thing , but when we use by we dont need to use  .value
-    //val searchAppbarState: SearchAppBarState by sharedViewModel.searchAppBarState
     val searchAppbarState =
         sharedViewModel.searchAppBarState.value //this and the line above do the same thing
 
@@ -73,7 +74,14 @@ fun ListUiScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedVie
             ListContent(
                 allTasks = allTasks.value,
                 searchedTasks = searchedTasks,
+                highPriorityTask = highPriorityTasks,
+                lowPriorityTask = lowPriorityTasks,
+                sortState = sortState,
                 navigateTodoTask = navigateToTaskScreen,
+                onSwipeToDelete = { action, todoTask ->
+                    sharedViewModel.action.value = action
+                    sharedViewModel.updateTaskField(todoTask)
+                },
                 searchAppBarState = searchAppbarState
             )
         }

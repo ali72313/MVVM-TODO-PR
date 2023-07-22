@@ -1,19 +1,27 @@
 package com.example.mvvm_todo_project.navigation
 
-import androidx.navigation.NavController
+
 import androidx.navigation.NavHostController
 import com.example.mvvm_todo_project.data.utils.Action
-import com.example.mvvm_todo_project.data.utils.Constants
+import com.example.mvvm_todo_project.data.utils.Constants.SPLASH_SCREEN
+import com.example.mvvm_todo_project.data.utils.Constants.LIST_SCREEN
+
 
 class Screens(navController: NavHostController) {
 
-    val list: (Action) -> Unit = { action ->
-        navController.navigate("list/${action.name}")
-        {
-            popUpTo(Constants.LIST_SCREEN) { inclusive = true }
+    val splashToList: () -> Unit = {
+        navController.navigate(route = "list/${Action.NO_ACTION}") {
+            popUpTo(SPLASH_SCREEN) { inclusive = true }
         }
     }
-    val task: (Int) -> Unit = { taskId ->
+
+    val taskToList: (Action) -> Unit = { action ->
+        navController.navigate("list/${action.name}")
+        {
+            popUpTo(LIST_SCREEN) { inclusive = true }
+        }
+    }
+    val listToTask: (Int) -> Unit = { taskId ->
         navController.navigate("task/$taskId")
     }
 }

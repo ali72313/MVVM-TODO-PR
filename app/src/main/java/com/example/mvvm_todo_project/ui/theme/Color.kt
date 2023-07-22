@@ -22,6 +22,11 @@ val topAppBarContentColor
     get() =
         if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.8f) else Color.White
 
+val splashScreenBackground
+    @Composable
+    get() =
+        if (isSystemInDarkTheme()) Color.Black else Purple40
+
 val fabBackGroundColor
     @Composable
     get() =

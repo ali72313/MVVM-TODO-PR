@@ -8,13 +8,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mvvm_todo_project.data.models.Priority
 import com.example.mvvm_todo_project.data.models.TodoTask
+import com.example.mvvm_todo_project.data.repositories.DataStoreRepository
 import com.example.mvvm_todo_project.data.repositories.TodoRepository
 import com.example.mvvm_todo_project.data.utils.Action
 import com.example.mvvm_todo_project.data.utils.RequestState
 import com.example.mvvm_todo_project.data.utils.SearchAppBarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     private val todoRepository: TodoRepository,
+    private val dataStoreRepository: DataStoreRepository,
     savedStateHandle: SavedStateHandle
 ) :
     ViewModel() {
@@ -63,6 +69,7 @@ class SharedViewModel @Inject constructor(
 
     init {
 
+
         _allTasks.value = RequestState.Loading
         try {
             viewModelScope.launch {
@@ -77,6 +84,20 @@ class SharedViewModel @Inject constructor(
             _allTasks.value = RequestState.Error(ex)
         }
     }
+
+    val lowPriorityTasks: StateFlow<List<TodoTask>> =
+        todoRepository.sorByLowPriority.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
+
+    val highPriorityTask: StateFlow<List<TodoTask>> =
+        todoRepository.sorByHighPriority.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
 
     private val _selectedTask: MutableStateFlow<TodoTask?> = MutableStateFlow(null)
     val selectedTask
@@ -109,6 +130,33 @@ class SharedViewModel @Inject constructor(
             description.value = ""
             priority.value = Priority.MEDIUM
 
+        }
+    }
+
+
+    private val _sortState =
+        MutableStateFlow<RequestState<Priority>>(RequestState.Idle)
+    val sortState get() = _sortState.asStateFlow()
+
+     fun readSortState() {
+        _sortState.value = RequestState.Loading
+
+        try {
+            viewModelScope.launch {
+                dataStoreRepository.readSortState.map { Priority.valueOf(it) }.collect() {
+                    _sortState.value = RequestState.Success(it)
+                }
+            }
+        } catch (ex: Exception) {
+            _searchedTasks.value = RequestState.Error(ex)
+        }
+
+
+    }
+
+    fun persistSortState(priority: Priority) {
+        viewModelScope.launch {
+            dataStoreRepository.persistSortState(priority = priority)
         }
     }
 

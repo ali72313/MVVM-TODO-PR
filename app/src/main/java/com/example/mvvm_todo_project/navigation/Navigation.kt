@@ -2,11 +2,11 @@ package com.example.mvvm_todo_project.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.example.mvvm_todo_project.data.utils.Constants.LIST_SCREEN
+import com.example.mvvm_todo_project.data.utils.Constants.SPLASH_SCREEN
 import com.example.mvvm_todo_project.navigation.destinations.listComposable
+import com.example.mvvm_todo_project.navigation.destinations.splashComposable
 import com.example.mvvm_todo_project.navigation.destinations.taskComposable
 import com.example.mvvm_todo_project.ui.viewModels.SharedViewModel
 
@@ -19,10 +19,12 @@ fun SetupNavigation(
         Screens(navController = navController)
     }
 
-    NavHost(navController = navController, startDestination = LIST_SCREEN) {
-        listComposable(sharedViewModel = sharedViewModel, navigateToTaskScreen = screen.task)
+    NavHost(navController = navController, startDestination = SPLASH_SCREEN) {
 
-        taskComposable(navigateToListScreen = screen.list, sharedViewModel = sharedViewModel)
+        splashComposable(navigateToListScreen = screen.splashToList)
+        listComposable(sharedViewModel = sharedViewModel, navigateToTaskScreen = screen.listToTask)
+
+        taskComposable(navigateToListScreen = screen.taskToList, sharedViewModel = sharedViewModel)
     }
 }
 

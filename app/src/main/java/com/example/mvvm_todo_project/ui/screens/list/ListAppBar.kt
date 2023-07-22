@@ -58,11 +58,14 @@ fun ListAppBar(
 
     when (searchAppBarState) {
         SearchAppBarState.CLOSED -> {
-            DefaultListAppBar(onSearchClicked = {
-                sharedViewModel.searchAppBarState.value = SearchAppBarState.OPENED
-            }, onSortClicked = {}, DeleteAllTasks = {
-                sharedViewModel.action.value = Action.DELETE_ALL
-            })
+            DefaultListAppBar(
+                onSearchClicked = {
+                    sharedViewModel.searchAppBarState.value = SearchAppBarState.OPENED
+                },
+                onSortClicked = { sharedViewModel.persistSortState(it) },
+                DeleteAllTasksConfirmation = {
+                    sharedViewModel.action.value = Action.DELETE_ALL
+                })
         }
 
         else -> {
@@ -81,10 +84,12 @@ fun ListAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultListAppBar(
-    onSearchClicked: () -> Unit, onSortClicked: (Priority) -> Unit, DeleteAllTasks: () -> Unit
+    onSearchClicked: () -> Unit,
+    onSortClicked: (Priority) -> Unit,
+    DeleteAllTasksConfirmation: () -> Unit
 ) {
     TopAppBar(actions = {
-        ListAppBarActions(onSearchClicked, onSortClicked, DeleteAllTasks)
+        ListAppBarActions(onSearchClicked, onSortClicked, DeleteAllTasksConfirmation)
 
     }, title = {
         Text(
@@ -96,7 +101,9 @@ fun DefaultListAppBar(
 
 @Composable
 fun ListAppBarActions(
-    onSearchClicked: () -> Unit, onSortClicked: (Priority) -> Unit, DeleteAllTasks: () -> Unit
+    onSearchClicked: () -> Unit,
+    onSortClicked: (Priority) -> Unit,
+    DeleteAllTasksConfirmation: () -> Unit
 ) {
     var openDialog by remember() { mutableStateOf(false) }
 
@@ -104,10 +111,10 @@ fun ListAppBarActions(
         title = stringResource(id = R.string.delete_task, "All Tasks "),
         message = stringResource(id = R.string.delete_task_conformation, "All Tasks "),
         openDialog = openDialog,
-        onYesClicked = { DeleteAllTasks() }, closeDialog = { openDialog = false })
+        onYesClicked = { DeleteAllTasksConfirmation() }, closeDialog = { openDialog = false })
     SearchAction(onSearchClicked)
     SortAction(sortByPriority = onSortClicked)
-    DeleteAllAction(openDialog = { openDialog = true })
+    DeleteAllAction(openDeleteAllConformationDialog = { openDialog = true })
 }
 
 @Composable
@@ -153,7 +160,7 @@ fun SortAction(sortByPriority: (Priority) -> Unit) {
 }
 
 @Composable
-fun DeleteAllAction(openDialog: () -> Unit) {
+fun DeleteAllAction(openDeleteAllConformationDialog: () -> Unit) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     IconButton(onClick = { isExpanded = true }) {
@@ -165,7 +172,7 @@ fun DeleteAllAction(openDialog: () -> Unit) {
         DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             DropdownMenuItem(onClick = {
                 isExpanded = false
-                openDialog.invoke()
+                openDeleteAllConformationDialog.invoke()
             }, text = {
                 Text(
                     modifier = Modifier.padding(start = LARGE_PADDING),
